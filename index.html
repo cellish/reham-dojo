@@ -233,7 +233,7 @@ h1 .en{font-weight:500;font-size:20px;color:var(--ink-2);letter-spacing:.04em;ma
 .quick span{font-size:12.5px;color:var(--ink-2)}
 .quick.bad{border-color:var(--av)}
 .legend code{font-family:ui-monospace,Menlo,monospace;background:var(--soft);padding:0 4px;border-radius:3px}
-.slot.can::before{content:"";position:absolute;top:4px;right:5px;width:6px;height:6px;border-radius:50%;border:2px solid var(--accent);background:transparent}
+.canbox{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-dasharray:5 3;opacity:.75;pointer-events:none}
 .fn.end b{text-decoration:underline;text-underline-offset:3px}
 .okmark{color:var(--ct)}
 .fbreak{flex-basis:100%;height:0}
@@ -274,7 +274,7 @@ h1 .en{font-weight:500;font-size:20px;color:var(--ink-2);letter-spacing:.04em;ma
 .legend .term[aria-expanded="true"]{border-bottom-style:solid;font-weight:600}
 .termbox{flex-basis:100%;margin:2px 0 0;padding:8px 12px;background:var(--soft);border-radius:8px;font-size:13px;line-height:1.7;color:var(--ink)}
 .termbox b{margin-right:6px}
-.canmark{display:inline-block;width:6px;height:6px;border-radius:50%;border:2px solid var(--accent)}
+.canmark{display:inline-block;width:16px;height:11px;border-radius:3px;border:1.6px dashed var(--accent)}
 
 .insp{padding:16px;display:flex;flex-direction:column;gap:16px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
 @media (max-width:720px){.insp{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:20;max-height:36vh;border-radius:14px 14px 0 0;border-bottom:0;
@@ -354,10 +354,9 @@ h2{font-size:13px;font-weight:700;margin:0 0 8px;letter-spacing:.04em;color:var(
         <button class="term" data-term="av" aria-expanded="false"><svg width="13" height="10" aria-hidden="true"><ellipse class="f-av" cx="6.5" cy="5" rx="5.4" ry="3.8" transform="rotate(-20 6.5 5)"/></svg>アボイド</button>
         <button class="term" data-term="nc" aria-expanded="false"><svg width="13" height="10" aria-hidden="true"><ellipse class="f-nc" cx="6.5" cy="5" rx="5.4" ry="3.8" transform="rotate(-20 6.5 5)"/></svg>非和声音</button>
         <span id="legendCan" hidden><i class="canmark" aria-hidden="true"></i>この段階の候補がある枠</span>
-        <span>音符の下の数字はコードに対する度数（薄い数字は弱拍の音）</span>
-        <span>五線を押しても枠を選べます</span>
+        <span>五線をクリックしても枠を選べます</span>
         <span>← → キーで枠を移動</span>
-        <span>コード名をキーで打つと、選んでいる枠に入ります（例：<code>Dm7</code>、<code>C/E</code> → Enter）</span>
+        <span>コード名はキー入力もできます（例：<code>Dm7</code> → Enter）</span>
         <p class="termbox" id="termbox" hidden></p>
       </div>
     </section>
@@ -936,7 +935,8 @@ function systemSvg(b0,bars,first,last,clefW,bps,units,M){
   let g="";
   const cells=[];
   units.forEach(i=>{ const u=state.chords[i], x1=M.edge(u.s), x2=M.edge(u.s+u.l); cells.push([+x1.toFixed(1),+x2.toFixed(1),i]);
-    g+=`<rect class="hl${i===state.sel?" sel":""}" data-i="${i}" x="${x1}" y="0" width="${x2-x1}" height="${HB}"/>`; });
+    g+=`<rect class="hl${i===state.sel?" sel":""}" data-i="${i}" x="${x1}" y="0" width="${x2-x1}" height="${HB}"/>`;
+      if(canCells.has(i)) g+=`<rect class="canbox" x="${x1+3}" y="${T-7}" width="${x2-x1-6}" height="${B-T+14}" rx="5"/>`; });
   for(let j=0;j<5;j++) g+=`<line class="stl" x1="0" x2="${end}" y1="${T+j*10}" y2="${T+j*10}"/>`;
   g+=`<line class="brl" x1="0.7" x2="0.7" y1="${T}" y2="${B}"/>`;
   for(let k=1;k<bars;k++) g+=`<line class="brl" x1="${xb(sys0+k*bpb)}" x2="${xb(sys0+k*bpb)}" y1="${T}" y2="${B}"/>`;
@@ -1096,7 +1096,8 @@ function vfSystem(b0,bars,first,last,bps,units){
   const svg = () => {
     let g=""; const cells=[];
     units.forEach(i=>{ const u=state.chords[i], x1=edge(u.s), x2=edge(u.s+u.l); cells.push([+x1.toFixed(1),+x2.toFixed(1),i]);
-      g+=`<rect class="hl${i===state.sel?" sel":""}" data-i="${i}" x="${x1}" y="0" width="${x2-x1}" height="${HB}"/>`; });
+      g+=`<rect class="hl${i===state.sel?" sel":""}" data-i="${i}" x="${x1}" y="0" width="${x2-x1}" height="${HB}"/>`;
+      if(canCells.has(i)) g+=`<rect class="canbox" x="${x1+3}" y="${T-7}" width="${x2-x1-6}" height="${B-T+14}" rx="5"/>`; });
     g+=`<g class="vfw">${inner}</g>`;
     info.forEach(s=>s.heads.forEach(h=>{ if(h.e.rest || h.kind==="pk") return;
       g+=`<text class="deg f-${h.kind}${h.strong?"":" weak"}" x="${h.x}" y="${DEG_Y}" text-anchor="middle">${esc(h.label)}</text>`; }));
@@ -1118,6 +1119,7 @@ function vfWaitFonts(){
   tick();
 }
 
+let canCells = new Set();   // cells the open reharm step has a fitting candidate for (dashed box on the staff)
 function render(){
   $("#songSel").value=state.songId;
   const n=state.chords.length, bpb=song.bpb, nb=song.nbars, bps=barsPerSystem();
@@ -1126,7 +1128,7 @@ function render(){
   const showBass = state.chords.some(u=>u.bass) || (!state.harm && state.tab==="guide" && getGStep()===4);
   BASS_Y = DEG_Y+17; HB = showBass ? DEG_Y+24 : H;
   const gs = (!state.harm && state.tab==="guide") ? getGStep() : 0;
-  const canSet = new Set(gs>=2 && gs<=7 ? state.chords.map((u,k)=>k).filter(k=>rStepUsable(gs,k)) : []);
+  const canSet = new Set(gs>=2 && gs<=7 ? state.chords.map((u,k)=>k).filter(k=>rStepUsable(gs,k)) : []); canCells = canSet;
   $("#legendCan").hidden = !canSet.size;
   let html="", cnt={good:0,ok:0,bad:0,none:0}, changed=0, match=0;
   for(let b0=0;b0<nb;b0+=bps){
@@ -1587,8 +1589,8 @@ function rGuideHtml(){
     h+=`<div class="chainrow"><span>課題：この段階の手法を ${goal} か所で使ってみよう（いま ${cnt}）${cnt>=goal?" <b class='okmark'>✓ 達成</b>":""}</span></div>
       <h3 class="sub">${slotName(i)}（原曲 ${esc(sym(origAt(i)))}）の候補</h3>`;
     h+= opts.length ? `<div class="cands revopts">${opts.map((o,k)=>candButton(o.c,i,`data-rc="${k}"`,`<span class="oname">${esc(o.name)}</span>`)).join("")}</div>`
-                    : `<p class="hint">この枠では、この段階の候補はありません。右上に ○ 印の付いた枠を選んでください。</p>`;
-    h+=`<div class="gbtns"><span class="hint" style="font-size:12.5px">メロディに合う候補がある枠：${usable.length}（コード名の右上に ○ 印）</span>${usable.length?`<button class="btn small" id="nextUsable">次の枠へ</button>`:""}</div>`;
+                    : `<p class="hint">この枠では、この段階の候補はありません。楽譜で点線に囲まれた枠を選んでください。</p>`;
+    h+=`<div class="gbtns"><span class="hint" style="font-size:12.5px">メロディに合う候補がある枠：${usable.length}（楽譜に点線の囲み）</span>${usable.length?`<button class="btn small" id="nextUsable">次の枠へ</button>`:""}</div>`;
     if(step===5) h+=`<div class="gbtns"><button class="btn small" id="toRev2" ${i<state.chords.length-1&&state.chords[i+1]?.root?"":"disabled"}>次の枠を着地点にして逆算タブで作る</button></div>`;
     h+=cmp;
   }
