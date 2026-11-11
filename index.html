@@ -233,7 +233,7 @@ h1 .en{font-weight:500;font-size:20px;color:var(--ink-2);letter-spacing:.04em;ma
 .quick span{font-size:12.5px;color:var(--ink-2)}
 .quick.bad{border-color:var(--av)}
 .legend code{font-family:ui-monospace,Menlo,monospace;background:var(--soft);padding:0 4px;border-radius:3px}
-.slot.can::before{content:"";position:absolute;top:4px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--tn)}
+.slot.can::before{content:"";position:absolute;top:4px;right:5px;width:6px;height:6px;border-radius:50%;border:2px solid var(--accent);background:transparent}
 .fn.end b{text-decoration:underline;text-underline-offset:3px}
 .okmark{color:var(--ct)}
 .fbreak{flex-basis:100%;height:0}
@@ -270,6 +270,11 @@ h1 .en{font-weight:500;font-size:20px;color:var(--ink-2);letter-spacing:.04em;ma
 
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--ink-2);border-top:1px solid var(--rule);padding-top:10px}
 .legend span{display:inline-flex;gap:5px;align-items:center}
+.legend .term{display:inline-flex;gap:5px;align-items:center;font:inherit;color:var(--ink);background:none;border:0;border-bottom:1px dashed var(--ink-2);padding:0 0 1px;cursor:pointer}
+.legend .term[aria-expanded="true"]{border-bottom-style:solid;font-weight:600}
+.termbox{flex-basis:100%;margin:2px 0 0;padding:8px 12px;background:var(--soft);border-radius:8px;font-size:13px;line-height:1.7;color:var(--ink)}
+.termbox b{margin-right:6px}
+.canmark{display:inline-block;width:6px;height:6px;border-radius:50%;border:2px solid var(--accent)}
 
 .insp{padding:16px;display:flex;flex-direction:column;gap:16px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
 @media (max-width:720px){.insp{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:20;max-height:36vh;border-radius:14px 14px 0 0;border-bottom:0;
@@ -298,13 +303,13 @@ h2{font-size:13px;font-weight:700;margin:0 0 8px;letter-spacing:.04em;color:var(
 .cand{display:flex;flex-direction:column;gap:3px;align-items:flex-start;border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:5px 8px 6px;cursor:pointer;min-width:78px}
 .cand:hover{border-color:var(--ink-2)}
 .cand.cur{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+</head>
+<body>
 .cand .cn{font-family:var(--f-chord);font-weight:600;font-size:19px;line-height:1.1;display:flex;align-items:center;gap:5px}
 .manual{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .manual select{border:1px solid var(--rule);background:var(--sheet);border-radius:8px;padding:5px 6px}
 .hint{font-size:12px;color:var(--ink-2);margin:0}
 </style>
-</head>
-<body>
 
 <div class="wrap">
   <header>
@@ -344,14 +349,16 @@ h2{font-size:13px;font-weight:700;margin:0 0 8px;letter-spacing:.04em;color:var(
       <div class="summary" id="summary"></div>
       <div class="sheet" id="sheet"></div>
       <div class="legend">
-        <span><svg width="13" height="10" aria-hidden="true"><ellipse class="f-ct" cx="6.5" cy="5" rx="5.4" ry="3.8" transform="rotate(-20 6.5 5)"/></svg>和声音</span>
-        <span><svg width="13" height="10" aria-hidden="true"><ellipse class="f-tn" cx="6.5" cy="5" rx="5.4" ry="3.8" transform="rotate(-20 6.5 5)"/></svg>テンション</span>
-        <span><svg width="13" height="10" aria-hidden="true"><ellipse class="f-av" cx="6.5" cy="5" rx="5.4" ry="3.8" transform="rotate(-20 6.5 5)"/></svg>アボイド</span>
-        <span><svg width="13" height="10" aria-hidden="true"><ellipse class="f-nc" cx="6.5" cy="5" rx="5.4" ry="3.8" transform="rotate(-20 6.5 5)"/></svg>非和声音</span>
+        <button class="term" data-term="ct" aria-expanded="false"><svg width="13" height="10" aria-hidden="true"><ellipse class="f-ct" cx="6.5" cy="5" rx="5.4" ry="3.8" transform="rotate(-20 6.5 5)"/></svg>和声音</button>
+        <button class="term" data-term="tn" aria-expanded="false"><svg width="13" height="10" aria-hidden="true"><ellipse class="f-tn" cx="6.5" cy="5" rx="5.4" ry="3.8" transform="rotate(-20 6.5 5)"/></svg>テンション</button>
+        <button class="term" data-term="av" aria-expanded="false"><svg width="13" height="10" aria-hidden="true"><ellipse class="f-av" cx="6.5" cy="5" rx="5.4" ry="3.8" transform="rotate(-20 6.5 5)"/></svg>アボイド</button>
+        <button class="term" data-term="nc" aria-expanded="false"><svg width="13" height="10" aria-hidden="true"><ellipse class="f-nc" cx="6.5" cy="5" rx="5.4" ry="3.8" transform="rotate(-20 6.5 5)"/></svg>非和声音</button>
+        <span id="legendCan" hidden><i class="canmark" aria-hidden="true"></i>この段階の候補がある枠</span>
         <span>音符の下の数字はコードに対する度数（薄い数字は弱拍の音）</span>
         <span>五線を押しても枠を選べます</span>
         <span>← → キーで枠を移動</span>
         <span>コード名をキーで打つと、選んでいる枠に入ります（例：<code>Dm7</code>、<code>C/E</code> → Enter）</span>
+        <p class="termbox" id="termbox" hidden></p>
       </div>
     </section>
    </div>
@@ -1107,7 +1114,7 @@ function vfSystem(b0,bars,first,last,bps,units){
 const ctxTies=[];
 function vfWaitFonts(){
   if(!VF()) return;
-  let n=0; const tick=()=>{ if(document.fonts.check("30px Bravura")){ vfFontOk=true; setGeom(); render(); return; } if(++n<60) setTimeout(tick,100); };
+  let n=0; const tick=()=>{ if(song && document.fonts.check("30px Bravura")){ vfFontOk=true; setGeom(); render(); return; } if(++n<60) setTimeout(tick,100); };
   tick();
 }
 
@@ -1120,6 +1127,7 @@ function render(){
   BASS_Y = DEG_Y+17; HB = showBass ? DEG_Y+24 : H;
   const gs = (!state.harm && state.tab==="guide") ? getGStep() : 0;
   const canSet = new Set(gs>=2 && gs<=7 ? state.chords.map((u,k)=>k).filter(k=>rStepUsable(gs,k)) : []);
+  $("#legendCan").hidden = !canSet.size;
   let html="", cnt={good:0,ok:0,bad:0,none:0}, changed=0, match=0;
   for(let b0=0;b0<nb;b0+=bps){
     const bars=Math.min(bps,nb-b0), first=b0===0, last=b0+bars>=nb, sys0=b0*bpb, sys1=(b0+bars)*bpb, pad=(bps-bars)*bpb;
@@ -1184,6 +1192,15 @@ function phraseEnds(){   // the cell that holds each phrase's last melody note
   return out;
 }
 
+// One line about the selected chord against the melody; the per-note detail is on the score itself.
+function verdictMsg(roles,v){
+  const names = list => [...new Map(list.map(r=>[r.name, `${esc(r.name)}（${esc(r.label)}・${KIND_TEXT[r.kind]}）`])).values()].join("、");
+  const clash = r => r.kind==="av"||r.kind==="nc";
+  if(v==="none") return "コードを置くと、音符の色と下の数字で、各音がそのコードの何度になるかがわかります。";
+  if(v==="bad") return `強拍の ${names(roles.filter(r=>clash(r)&&r.strong&&!r.passing))} がぶつかっています。狙った緊張か、聴いて確かめましょう。`;
+  if(v==="ok") return `弱拍の ${names(roles.filter(r=>clash(r)&&!r.strong&&!r.passing))} は、通り過ぎる音として聞こえれば問題ありません。`;
+  return "メロディはこのコードによく収まっています。";
+}
 function selbarHtml(i){
   const c=state.chords[i], o=origAt(i), next=state.chords[i+1];
   const roles=rolesFor(c,i), v=verdict(roles);
@@ -1200,10 +1217,7 @@ function selbarHtml(i){
       ${state.harm?`<button class="btn" id="revert" ${c.root?"":"disabled"}>コードを消す</button>`:`<button class="btn" id="revert" ${isChanged(i)?"":"disabled"}>原曲に戻す</button>`}
     </span>
   </div>
-  <div class="rolerow"><span class="ilabel">メロディ音</span>${roles.map(r=>`<span class="rk" title="${KIND_NOTE[r.kind]}">${chipHtml(r)}<small>${KIND_TEXT[r.kind]}${r.strong?"":"・弱拍"}${r.passing?"・経過音":""}</small></span>`).join("")}
-    <span class="pill ${v}">${VERDICT_TEXT[v]}</span><span class="vmsg">${
-    v==="bad"?"強拍の音がぶつかっています。意図した緊張かどうか、聴いて判断してください。":
-    v==="ok"?"弱拍の音は経過音・刺繍音として聞こえれば問題ありません。":v==="none"?"コードを置くと、各音がそのコードの何度になるかが表示されます。":"メロディはこのコードによく収まっています。"}</span></div>`;
+  <div class="rolerow"><span class="pill ${v}">${VERDICT_TEXT[v]}</span><span class="vmsg">${verdictMsg(roles,v)}</span></div>`;
 }
 function candButton(cd, i, attrs, extra){
   const rs=rolesFor(cd,i), vv=verdict(rs);
@@ -1573,8 +1587,8 @@ function rGuideHtml(){
     h+=`<div class="chainrow"><span>課題：この段階の手法を ${goal} か所で使ってみよう（いま ${cnt}）${cnt>=goal?" <b class='okmark'>✓ 達成</b>":""}</span></div>
       <h3 class="sub">${slotName(i)}（原曲 ${esc(sym(origAt(i)))}）の候補</h3>`;
     h+= opts.length ? `<div class="cands revopts">${opts.map((o,k)=>candButton(o.c,i,`data-rc="${k}"`,`<span class="oname">${esc(o.name)}</span>`)).join("")}</div>`
-                    : `<p class="hint">この枠では、この段階の候補はありません。楽譜の青い点の付いた枠を選んでください。</p>`;
-    h+=`<div class="gbtns"><span class="hint" style="font-size:12.5px">メロディに合う候補がある枠：${usable.length}（楽譜に青い点）</span>${usable.length?`<button class="btn small" id="nextUsable">次の枠へ</button>`:""}</div>`;
+                    : `<p class="hint">この枠では、この段階の候補はありません。右上に ○ 印の付いた枠を選んでください。</p>`;
+    h+=`<div class="gbtns"><span class="hint" style="font-size:12.5px">メロディに合う候補がある枠：${usable.length}（コード名の右上に ○ 印）</span>${usable.length?`<button class="btn small" id="nextUsable">次の枠へ</button>`:""}</div>`;
     if(step===5) h+=`<div class="gbtns"><button class="btn small" id="toRev2" ${i<state.chords.length-1&&state.chords[i+1]?.root?"":"disabled"}>次の枠を着地点にして逆算タブで作る</button></div>`;
     h+=cmp;
   }
@@ -1677,18 +1691,19 @@ function stop(){
   const g=play.bus, t=ctx.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value,t); g.gain.linearRampToValueAtTime(0,t+.05);
   setTimeout(()=>g.disconnect(),150); play=null; markPlaying(-1); playButtons();
 }
-function playRange(from,to,chords,mode){
+function playRange(from,to,chords,mode,startBeat){
   stop(); ensureCtx();
   const bus=ctx.createGain(); bus.connect(master);
-  const spb=60/state.bpm, b0=chords[from].s-(from===0?song.pk:0), b1=chords[to-1].s+chords[to-1].l, t0=ctx.currentTime+.06;
-  for(let i=from;i<to;i++){ if(!chords[i].root) continue; const u=chords[i], v=voicing(u), t=t0+(u.s-b0)*spb, d=u.l*spb;
+  const spb=60/state.bpm, b0=startBeat ?? chords[from].s-(from===0?song.pk:0), b1=chords[to-1].s+chords[to-1].l, t0=ctx.currentTime+.06;
+  for(let i=from;i<to;i++){ if(!chords[i].root) continue; const u=chords[i], v=voicing(u), s=Math.max(u.s,b0), e=u.s+u.l;
+    if(e<=s+1e-6) continue; const t=t0+(s-b0)*spb, d=(e-s)*spb;
     tone(bus,v.bass,t,d,"bass"); v.ups.forEach(m=>tone(bus,m,t,d,"chord")); }
   if(state.melOn) song.notes.forEach(n=>{
     if(n.tiedFrom && n.start>b0+1e-6) return;
     let dur=n.dur, k=n.idx; while(song.notes[k].tie && song.notes[k+1]){ k++; dur+=song.notes[k].dur; }
     if(n.start<b1 && n.start+dur>b0){
       const s=Math.max(n.start,b0), e=Math.min(n.start+dur,b1); tone(bus,n.midi+xp.semis,t0+(s-b0)*spb,(e-s)*spb,"mel"); }});
-  play={bus,mode,raf:0};
+  play={bus,mode,raf:0, from,to,chords, beat:()=>(ctx.currentTime-t0)/spb+b0};
   const tick=()=>{ if(!play) return; const beat=(ctx.currentTime-t0)/spb+b0;
     if(beat>=b1){ play.bus.disconnect && setTimeout(()=>bus.disconnect(),600); play=null; markPlaying(-1); playButtons(); return; }
     markPlaying(beat>=0 && mode!=="orig"? unitAt(beat):-1); play.raf=requestAnimationFrame(tick); };
@@ -1844,7 +1859,25 @@ function applyHarmUi(){
 }
 $("#summary").addEventListener("change",e=>{ if(e.target.id==="revealOn"){ state.reveal=e.target.checked; applyHarmUi(); render(); } });
 $("#playOrig").onclick=()=>{ if(play&&play.mode==="orig") stop(); else { const ou=origUnits(); playRange(0,ou.length,ou,"orig"); } };
-$("#bpm").oninput=e=>{ state.bpm=+e.target.value; $("#bpmOut").textContent=state.bpm; };
+const TERM_TEXT = {
+  ct:["和声音","コードを形づくる音です（根音 R・3度・5度・7度など）。メロディがこの音だと、コードによく溶け込みます。"],
+  tn:["テンション","コードの音には含まれないけれど、重ねると響きを豊かにする音です（9・11・13度など）。ジャズやポップスでは、強拍や長い音にあっても「しゃれた響き」として使えます。"],
+  av:["アボイド","コードの音と半音でぶつかって、響きを濁らせやすい音です。たとえば C の上のファ（11度）は、コードのミと半音でぶつかります。弱拍で通り過ぎるだけなら問題ありませんが、強拍や長い音では避けるか、コードを替えます。"],
+  nc:["非和声音","コードの音にもテンションにも当たらない音です。経過音（音階を順に通り過ぎる音）や刺繍音（隣の音に行って戻る音）として弱拍で鳴るなら自然ですが、強拍で長く鳴るとぶつかって聞こえます。"],
+};
+document.querySelectorAll(".legend .term").forEach(b=>b.onclick=()=>{
+  const open=b.getAttribute("aria-expanded")==="true", box=$("#termbox");
+  document.querySelectorAll(".legend .term").forEach(x=>x.setAttribute("aria-expanded","false"));
+  if(open){ box.hidden=true; return; }
+  const [t,txt]=TERM_TEXT[b.dataset.term]; box.innerHTML=`<b>${t}</b>${txt}`; box.hidden=false; b.setAttribute("aria-expanded","true");
+});
+// A tempo change while playing restarts playback from the current beat at the new tempo
+// (debounced, so dragging the slider does not re-attack the chords on every step).
+let bpmTimer=0;
+$("#bpm").oninput=e=>{ state.bpm=+e.target.value; $("#bpmOut").textContent=state.bpm;
+  if(!play) return; clearTimeout(bpmTimer);
+  bpmTimer=setTimeout(()=>{ if(!play) return; const p=play, at=p.beat();
+    playRange(p.from, p.to, p.chords, p.mode, Math.max(at, p.chords[p.from].s-(p.from===0?song.pk:0))); }, 90); };
 $("#melOn").onchange=e=>{ state.melOn=e.target.checked; };
 $("#reset").onclick=()=>{ $("#resetMsg").textContent = state.harm?"置いたコードをすべて消しますか？":"置き換えをすべて元に戻しますか？";
   $("#resetConfirm").hidden=false; $("#resetYes").focus(); };
@@ -1893,9 +1926,10 @@ $("#quickIn").addEventListener("keydown", e=>{
   }
 });
 
-restoreTab(); applyHarmUi(); vfWaitFonts();
+restoreTab(); applyHarmUi();
 const last=store.get("rehamo:last");
 loadSong(SONGS[last]?last:"twinkle");
+vfWaitFonts();   // after loadSong: its re-render needs a song in place
 </script>
 
 </body>
