@@ -233,7 +233,7 @@ h1 .en{font-weight:500;font-size:20px;color:var(--ink-2);letter-spacing:.04em;ma
 .quick span{font-size:12.5px;color:var(--ink-2)}
 .quick.bad{border-color:var(--av)}
 .legend code{font-family:ui-monospace,Menlo,monospace;background:var(--soft);padding:0 4px;border-radius:3px}
-.canbox{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-dasharray:5 3;opacity:.75;pointer-events:none}
+.slot.can .chord{width:fit-content;max-width:100%;box-sizing:border-box;padding:1px 5px;margin-left:-5px;outline:1.5px dashed var(--accent);outline-offset:-1px;border-radius:5px}   /* this step has a fitting candidate here */
 .fn.end b{text-decoration:underline;text-underline-offset:3px}
 .okmark{color:var(--ct)}
 .fbreak{flex-basis:100%;height:0}
@@ -935,8 +935,7 @@ function systemSvg(b0,bars,first,last,clefW,bps,units,M){
   let g="";
   const cells=[];
   units.forEach(i=>{ const u=state.chords[i], x1=M.edge(u.s), x2=M.edge(u.s+u.l); cells.push([+x1.toFixed(1),+x2.toFixed(1),i]);
-    g+=`<rect class="hl${i===state.sel?" sel":""}" data-i="${i}" x="${x1}" y="0" width="${x2-x1}" height="${HB}"/>`;
-      if(canCells.has(i)) g+=`<rect class="canbox" x="${x1+3}" y="${T-7}" width="${x2-x1-6}" height="${B-T+14}" rx="5"/>`; });
+    g+=`<rect class="hl${i===state.sel?" sel":""}" data-i="${i}" x="${x1}" y="0" width="${x2-x1}" height="${HB}"/>`; });
   for(let j=0;j<5;j++) g+=`<line class="stl" x1="0" x2="${end}" y1="${T+j*10}" y2="${T+j*10}"/>`;
   g+=`<line class="brl" x1="0.7" x2="0.7" y1="${T}" y2="${B}"/>`;
   for(let k=1;k<bars;k++) g+=`<line class="brl" x1="${xb(sys0+k*bpb)}" x2="${xb(sys0+k*bpb)}" y1="${T}" y2="${B}"/>`;
@@ -1096,8 +1095,7 @@ function vfSystem(b0,bars,first,last,bps,units){
   const svg = () => {
     let g=""; const cells=[];
     units.forEach(i=>{ const u=state.chords[i], x1=edge(u.s), x2=edge(u.s+u.l); cells.push([+x1.toFixed(1),+x2.toFixed(1),i]);
-      g+=`<rect class="hl${i===state.sel?" sel":""}" data-i="${i}" x="${x1}" y="0" width="${x2-x1}" height="${HB}"/>`;
-      if(canCells.has(i)) g+=`<rect class="canbox" x="${x1+3}" y="${T-7}" width="${x2-x1-6}" height="${B-T+14}" rx="5"/>`; });
+      g+=`<rect class="hl${i===state.sel?" sel":""}" data-i="${i}" x="${x1}" y="0" width="${x2-x1}" height="${HB}"/>`; });
     g+=`<g class="vfw">${inner}</g>`;
     info.forEach(s=>s.heads.forEach(h=>{ if(h.e.rest || h.kind==="pk") return;
       g+=`<text class="deg f-${h.kind}${h.strong?"":" weak"}" x="${h.x}" y="${DEG_Y}" text-anchor="middle">${esc(h.label)}</text>`; }));
@@ -1119,7 +1117,6 @@ function vfWaitFonts(){
   tick();
 }
 
-let canCells = new Set();   // cells the open reharm step has a fitting candidate for (dashed box on the staff)
 function render(){
   $("#songSel").value=state.songId;
   const n=state.chords.length, bpb=song.bpb, nb=song.nbars, bps=barsPerSystem();
@@ -1128,7 +1125,7 @@ function render(){
   const showBass = state.chords.some(u=>u.bass) || (!state.harm && state.tab==="guide" && getGStep()===4);
   BASS_Y = DEG_Y+17; HB = showBass ? DEG_Y+24 : H;
   const gs = (!state.harm && state.tab==="guide") ? getGStep() : 0;
-  const canSet = new Set(gs>=2 && gs<=7 ? state.chords.map((u,k)=>k).filter(k=>rStepUsable(gs,k)) : []); canCells = canSet;
+  const canSet = new Set(gs>=2 && gs<=7 ? state.chords.map((u,k)=>k).filter(k=>rStepUsable(gs,k)) : []);
   $("#legendCan").hidden = !canSet.size;
   let html="", cnt={good:0,ok:0,bad:0,none:0}, changed=0, match=0;
   for(let b0=0;b0<nb;b0+=bps){
@@ -1589,8 +1586,8 @@ function rGuideHtml(){
     h+=`<div class="chainrow"><span>課題：この段階の手法を ${goal} か所で使ってみよう（いま ${cnt}）${cnt>=goal?" <b class='okmark'>✓ 達成</b>":""}</span></div>
       <h3 class="sub">${slotName(i)}（原曲 ${esc(sym(origAt(i)))}）の候補</h3>`;
     h+= opts.length ? `<div class="cands revopts">${opts.map((o,k)=>candButton(o.c,i,`data-rc="${k}"`,`<span class="oname">${esc(o.name)}</span>`)).join("")}</div>`
-                    : `<p class="hint">この枠では、この段階の候補はありません。楽譜で点線に囲まれた枠を選んでください。</p>`;
-    h+=`<div class="gbtns"><span class="hint" style="font-size:12.5px">メロディに合う候補がある枠：${usable.length}（楽譜に点線の囲み）</span>${usable.length?`<button class="btn small" id="nextUsable">次の枠へ</button>`:""}</div>`;
+                    : `<p class="hint">この枠では、この段階の候補はありません。コード名が点線で囲まれた枠を選んでください。</p>`;
+    h+=`<div class="gbtns"><span class="hint" style="font-size:12.5px">メロディに合う候補がある枠：${usable.length}（コード名を点線で囲んであります）</span>${usable.length?`<button class="btn small" id="nextUsable">次の枠へ</button>`:""}</div>`;
     if(step===5) h+=`<div class="gbtns"><button class="btn small" id="toRev2" ${i<state.chords.length-1&&state.chords[i+1]?.root?"":"disabled"}>次の枠を着地点にして逆算タブで作る</button></div>`;
     h+=cmp;
   }
